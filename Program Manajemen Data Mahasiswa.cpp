@@ -1,508 +1,575 @@
 #include <iostream>
-#include <limits> // for 'numeric_limits'
-#include <string> // Add this for using 'string'
-#include <cstdint> // for 'int64_t'
+#include <string>
+#include <queue>
+#include <stack>
+#include <unordered_map>
 
 using namespace std;
 
-void errorInput(int &input) {
-    while (true) {
-        if (cin.fail()) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "\n>> Input bukan angka\n\n";
-            cout << "> ";
-            cin >> input;
-        } else {
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            break;
-        }
-    }
-}
-
-void errorInputFloat(float &input) {
-    while (true) {
-        if (cin.fail()) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "\n>> Input bukan angka\n\n";
-            cout << "> ";
-            cin >> input;
-        } else {
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            break;
-        }
-    }
-}
-
-int64_t stringToInt64_t(const string namaMahasiswa) { // Mengubah nama mahasiswa menjadi nim
-    int64_t nimMahasiswa = 0;
-    for (char ch : namaMahasiswa) {
-        if (ch != ' ') {
-            nimMahasiswa += (tolower(ch) - 'a' + 1);
-        }
-    }
-
-    return nimMahasiswa;
-}
-
-int64_t membuatNim(string namaMahasiswa, int64_t nimBawaan) { // Fungsi membuat nim
-
-    int64_t asciiNamaMahasiswa = stringToInt64_t(namaMahasiswa);  // Ubah nama jadi int64_t
-    string stringNamaMahasiswa = to_string(nimBawaan) + to_string(asciiNamaMahasiswa);  // Ubah nim dan nama jadi string, lalu tambah keduanya
-
-    int64_t NimMahasiswa = stoll(stringNamaMahasiswa); // Khusus, ubah string ke int64_t
-    return NimMahasiswa;
-}
-
-struct treeMahasiswaTI { // Inisialisasi tree mahasiswa TI
-
-    int64_t  nimMahasiswaTI = 23051204;
-    float ipMahasiswaTI;
+struct treeMahasiswaTI {
+    int64_t nimMahasiswaTI;
     string namaMahasiswaTI;
-    string umurMahasiswaTI;
+    int umurMahasiswaTI;
     string alamatMahasiswaTI;
-
-    treeMahasiswaTI* left;
-    treeMahasiswaTI* right;
+    float ipMahasiswaTI;
     treeMahasiswaTI* next;
-
-    treeMahasiswaTI() : left(nullptr), right(nullptr) {} // Default double link list constructor
-
-    treeMahasiswaTI(int64_t nim, float ip, string nama, string umur, string alamat) : // Default tree constructor
-    nimMahasiswaTI(nim), ipMahasiswaTI(ip), namaMahasiswaTI(nama), umurMahasiswaTI(umur), alamatMahasiswaTI(alamat), left(nullptr), right(nullptr) {}
 };
 
-struct treeMahasiswaSI { // Inisialisasi tree mahasiswa SI
-
-    int64_t nimMahasiswaSI = 23051205;
-    float ipMahasiswaSI;
+struct treeMahasiswaSI {
+    int64_t nimMahasiswaSI;
     string namaMahasiswaSI;
-    string umurMahasiswaSI;
+    int umurMahasiswaSI;
     string alamatMahasiswaSI;
-
-    treeMahasiswaSI* left;
-    treeMahasiswaSI* right;
+    float ipMahasiswaSI;
     treeMahasiswaSI* next;
-
-    treeMahasiswaSI() : left(nullptr), right(nullptr) {} // Default double link list constructor
-
-    treeMahasiswaSI(int64_t nim, float ip, string nama, string umur, string alamat) : // Default tree constructor
-    nimMahasiswaSI(nim), ipMahasiswaSI(ip), namaMahasiswaSI(nama), umurMahasiswaSI(umur), alamatMahasiswaSI(alamat), left(nullptr), right(nullptr) {}
 };
 
-struct treeMahasiswaPTI { // Inisialisasi tree mahasiswa PTI
-
-    int64_t nimMahasiswaPTI = 23051206;
-    float ipMahasiswaPTI;
+struct treeMahasiswaPTI {
+    int64_t nimMahasiswaPTI;
     string namaMahasiswaPTI;
-    string umurMahasiswaPTI;
+    int umurMahasiswaPTI;
     string alamatMahasiswaPTI;
-
-    treeMahasiswaPTI* left;
-    treeMahasiswaPTI* right;
+    float ipMahasiswaPTI;
     treeMahasiswaPTI* next;
-
-    treeMahasiswaPTI() : left(nullptr), right(nullptr) {} // Default double link list constructor
-
-    treeMahasiswaPTI(int64_t nim, float ip, string nama, string umur, string alamat) : // Default tree constructor
-    nimMahasiswaPTI(nim), ipMahasiswaPTI(ip), namaMahasiswaPTI(nama), umurMahasiswaPTI(umur), alamatMahasiswaPTI(alamat), left(nullptr), right(nullptr) {}
 };
 
-
-
-class dataMahasiswa {
-
-    private:
-
+class DataMahasiswa {
+private:
     treeMahasiswaTI* headTI;
     treeMahasiswaSI* headSI;
     treeMahasiswaPTI* headPTI;
+    unordered_map<int64_t, treeMahasiswaTI*> hashTableTI;
+    unordered_map<int64_t, treeMahasiswaSI*> hashTableSI;
+    unordered_map<int64_t, treeMahasiswaPTI*> hashTablePTI;
+    queue<treeMahasiswaTI*> queueTI;
+    queue<treeMahasiswaSI*> queueSI;
+    queue<treeMahasiswaPTI*> queuePTI;
+    stack<treeMahasiswaTI*> stackTI;
+    stack<treeMahasiswaSI*> stackSI;
+    stack<treeMahasiswaPTI*> stackPTI;
+    int totaldataTI;
+    int totaldataSI;
+    int totaldataPTI;
 
-    int currentIndexTI, currentIndexSI, currentIndexPTI;
-    int totaldataTI, totaldataSI, totaldataPTI;
+public:
+    DataMahasiswa() {
+        headTI = nullptr;
+        headSI = nullptr;
+        headPTI = nullptr;
+        totaldataTI = 0;
+        totaldataSI = 0;
+        totaldataPTI = 0;
+    }
 
-    treeMahasiswaTI* mahasiswaTIByIndex(int index) {
+    void tambahDataEligible() {
+        int pilihan;
+        cout << "\nTambah data untuk:\n";
+        cout << "1. Mahasiswa TI\n";
+        cout << "2. Mahasiswa SI\n";
+        cout << "3. Mahasiswa PTI\n";
+        cout << "Masukkan pilihan: ";
+        cin >> pilihan;
+
+        switch (pilihan) {
+            case 1:
+                tambahDataTI();
+                break;
+            case 2:
+                tambahDataSI();
+                break;
+            case 3:
+                tambahDataPTI();
+                break;
+            default:
+                cout << "\nPilihan tidak valid.\n";
+        }
+    }
+
+    void tambahDataTI() {
+        auto* newMahasiswa = new treeMahasiswaTI();
+        cout << "\nMasukkan NIM: ";
+        cin >> newMahasiswa->nimMahasiswaTI;
+        cout << "Masukkan Nama: ";
+        cin.ignore();
+        getline(cin, newMahasiswa->namaMahasiswaTI);
+        cout << "Masukkan Umur: ";
+        cin >> newMahasiswa->umurMahasiswaTI;
+        cout << "Masukkan Alamat: ";
+        cin.ignore();
+        getline(cin, newMahasiswa->alamatMahasiswaTI);
+        cout << "Masukkan IP: ";
+        cin >> newMahasiswa->ipMahasiswaTI;
+
+        newMahasiswa->next = headTI;
+        headTI = newMahasiswa;
+
+        hashTableTI[newMahasiswa->nimMahasiswaTI] = newMahasiswa;
+
+        if (newMahasiswa->ipMahasiswaTI >= 3.5) {
+            queueTI.push(newMahasiswa);
+            stackTI.push(newMahasiswa);
+        }
+
+        totaldataTI++;
+    }
+
+    void tambahDataSI() {
+        auto* newMahasiswa = new treeMahasiswaSI();
+        cout << "\nMasukkan NIM: ";
+        cin >> newMahasiswa->nimMahasiswaSI;
+        cout << "Masukkan Nama: ";
+        cin.ignore();
+        getline(cin, newMahasiswa->namaMahasiswaSI);
+        cout << "Masukkan Umur: ";
+        cin >> newMahasiswa->umurMahasiswaSI;
+        cout << "Masukkan Alamat: ";
+        cin.ignore();
+        getline(cin, newMahasiswa->alamatMahasiswaSI);
+        cout << "Masukkan IP: ";
+        cin >> newMahasiswa->ipMahasiswaSI;
+
+        newMahasiswa->next = headSI;
+        headSI = newMahasiswa;
+
+        hashTableSI[newMahasiswa->nimMahasiswaSI] = newMahasiswa;
+
+        if (newMahasiswa->ipMahasiswaSI >= 3.5) {
+            queueSI.push(newMahasiswa);
+            stackSI.push(newMahasiswa);
+        }
+
+        totaldataSI++;
+    }
+
+    void tambahDataPTI() {
+        auto* newMahasiswa = new treeMahasiswaPTI();
+        cout << "\nMasukkan NIM: ";
+        cin >> newMahasiswa->nimMahasiswaPTI;
+        cout << "Masukkan Nama: ";
+        cin.ignore();
+        getline(cin, newMahasiswa->namaMahasiswaPTI);
+        cout << "Masukkan Umur: ";
+        cin >> newMahasiswa->umurMahasiswaPTI;
+        cout << "Masukkan Alamat: ";
+        cin.ignore();
+        getline(cin, newMahasiswa->alamatMahasiswaPTI);
+        cout << "Masukkan IP: ";
+        cin >> newMahasiswa->ipMahasiswaPTI;
+
+        newMahasiswa->next = headPTI;
+        headPTI = newMahasiswa;
+
+        hashTablePTI[newMahasiswa->nimMahasiswaPTI] = newMahasiswa;
+
+        if (newMahasiswa->ipMahasiswaPTI >= 3.5) {
+            queuePTI.push(newMahasiswa);
+            stackPTI.push(newMahasiswa);
+        }
+
+        totaldataPTI++;
+    }
+
+    void tampilData() {
+        cout << "\nTampilkan data untuk:\n";
+        cout << "1. Mahasiswa TI\n";
+        cout << "2. Mahasiswa SI\n";
+        cout << "3. Mahasiswa PTI\n";
+        cout << "Masukkan pilihan: ";
+        int pilihan;
+        cin >> pilihan;
+
+        switch (pilihan) {
+            case 1:
+                tampilDataTI();
+                break;
+            case 2:
+                tampilDataSI();
+                break;
+            case 3:
+                tampilDataPTI();
+                break;
+            default:
+                cout << "\nPilihan tidak valid.\n";
+        }
+    }
+
+    void tampilDataTI() {
         treeMahasiswaTI* currTI = headTI;
-        for(int i=0; i<index && currTI!=nullptr; i++) {
-            currTI = currTI->next; 
+        cout << "\nData Mahasiswa TI:\n";
+        while (currTI) {
+            cout << "\nNIM: " << currTI->nimMahasiswaTI << "\n";
+            cout << "Nama: " << currTI->namaMahasiswaTI << "\n";
+            cout << "Umur: " << currTI->umurMahasiswaTI << "\n";
+            cout << "Alamat: " << currTI->alamatMahasiswaTI << "\n";
+            cout << "IP: " << currTI->ipMahasiswaTI << "\n";
+            currTI = currTI->next;
         }
-        return currTI;
     }
 
-    treeMahasiswaSI* mahasiswaSIByIndex(int index) {
+    void tampilDataSI() {
         treeMahasiswaSI* currSI = headSI;
-        for(int i=0; i<index && currSI!=nullptr; i++) {
-            currSI = currSI->next; 
+        cout << "\nData Mahasiswa SI:\n";
+        while (currSI) {
+            cout << "\nNIM: " << currSI->nimMahasiswaSI << "\n";
+            cout << "Nama: " << currSI->namaMahasiswaSI << "\n";
+            cout << "Umur: " << currSI->umurMahasiswaSI << "\n";
+            cout << "Alamat: " << currSI->alamatMahasiswaSI << "\n";
+            cout << "IP: " << currSI->ipMahasiswaSI << "\n";
+            currSI = currSI->next;
         }
-        return currSI;
     }
 
-    treeMahasiswaPTI* mahasiswaPTIByIndex(int index) {
+    void tampilDataPTI() {
         treeMahasiswaPTI* currPTI = headPTI;
-        for(int i=0; i<index && currPTI!=nullptr; i++) {
-            currPTI = currPTI->next; 
+        cout << "\nData Mahasiswa PTI:\n";
+        while (currPTI) {
+            cout << "\nNIM: " << currPTI->nimMahasiswaPTI << "\n";
+            cout << "Nama: " << currPTI->namaMahasiswaPTI << "\n";
+            cout << "Umur: " << currPTI->umurMahasiswaPTI << "\n";
+            cout << "Alamat: " << currPTI->alamatMahasiswaPTI << "\n";
+            cout << "IP: " << currPTI->ipMahasiswaPTI << "\n";
+            currPTI = currPTI->next;
         }
-        return currPTI;
     }
 
-    public:
+    void hapusData() {
+        cout << "\nHapus data untuk:\n";
+        cout << "1. Mahasiswa TI\n";
+        cout << "2. Mahasiswa SI\n";
+        cout << "3. Mahasiswa PTI\n";
+        cout << "Masukkan pilihan: ";
+        int pilihan;
+        cin >> pilihan;
 
-    dataMahasiswa() : headTI(nullptr), headSI(nullptr), headPTI(nullptr), currentIndexTI(0),
-    currentIndexSI(0), currentIndexPTI(0), totaldataTI(0), totaldataSI(0), totaldataPTI(0) {}
-
-        // ----------------------------------------------------- Fungsi menambahkan data -----------------------------------------------------
-    
-        void tambahDataTI() {
-            treeMahasiswaTI* newDataTI = new treeMahasiswaTI();
-
-            int64_t nimMahasiswa;
-            float ipMahasiswa;
-            string namaMahasiswa;
-            string umurMahasiswa;
-            string alamatMahasiswa;
-
-            cout << "\nNama Mahasiswa: ";
-            getline(cin, namaMahasiswa);
-
-            cout << "Usia Mahasiswa: ";
-            cin >> umurMahasiswa;            
-
-            cout << "Alamat Mahasiswa: ";
-            cin >> alamatMahasiswa;
-
-            cout << "Masukkan IP Mahasiswa: ";
-            cin >> ipMahasiswa;
-            errorInputFloat(ipMahasiswa);
-            
-            nimMahasiswa = membuatNim(namaMahasiswa, nimMahasiswa); // Panggil fungsi untuk membuat nim
-
-            nimMahasiswa, newDataTI->nimMahasiswaTI;
-            namaMahasiswa, newDataTI->namaMahasiswaTI;
-            umurMahasiswa, newDataTI->umurMahasiswaTI;
-            alamatMahasiswa, newDataTI->alamatMahasiswaTI;
-            ipMahasiswa, newDataTI->ipMahasiswaTI;
-
-
-
-
-
-
-            // getline(cin, newDataTI->namaMahasiswaTI);
-            // cin >> newDataTI->umurMahasiswaTI;
-            // cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            // getline(cin, newDataTI->alamatMahasiswaTI);
-            // cin >> newDataTI->ipMahasiswaTI;
-            
-            newDataTI->next = nullptr;
-
-            if (!headTI) {
-                headTI = newDataTI;
-            } else {
-                treeMahasiswaTI* temp = headTI;
-                while (temp->next != nullptr) {
-                temp = temp->next;
-                }
-            temp->next = newDataTI;
-            }
-        
-            totaldataTI++;
-            cout << "Data mahasiswa berhasil ditambahkan.\n";
+        switch (pilihan) {
+            case 1:
+                hapusDataTI();
+                break;
+            case 2:
+                hapusDataSI();
+                break;
+            case 3:
+                hapusDataPTI();
+                break;
+            default:
+                cout << "\nPilihan tidak valid.\n";
         }
+    }
 
-        void tambahDataSI() {
-            treeMahasiswaSI* newDataSI = new treeMahasiswaSI();
+    void hapusDataTI() {
+        int64_t nim;
+        cout << "\nMasukkan NIM mahasiswa yang ingin dihapus: ";
+        cin >> nim;
 
-            cout << "\nNama Mahasiswa: ";
-            getline(cin, newDataSI->namaMahasiswaSI);
-
-            cout << "Usia Mahasiswa: ";
-            cin >> newDataSI->umurMahasiswaSI;
-
-            cout << "Alamat Mahasiswa: ";
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            getline(cin, newDataSI->alamatMahasiswaSI);
-
-            cout << "Masukkan IP Mahasiswa: ";
-            cin >> newDataSI->ipMahasiswaSI;
-            
-            newDataSI->next = nullptr;
-
-            if (!headSI) {
-                headSI = newDataSI;
-            } else {
-                treeMahasiswaSI* temp = headSI;
-                while (temp->next != nullptr) {
-                    temp = temp->next;
-                }
-                temp->next = newDataSI;
-            }
-
-            totaldataSI++;
-            cout << "Data mahasiswa berhasil ditambahkan.\n";
-        }
-
-        void tambahDataPTI() {
-            treeMahasiswaPTI* newDataPTI = new treeMahasiswaPTI();
-
-            cout << "\nNama Mahasiswa: ";
-            getline(cin, newDataPTI->namaMahasiswaPTI);
-
-            cout << "Usia Mahasiswa: ";
-            cin >> newDataPTI->umurMahasiswaPTI;
-
-            cout << "Alamat Mahasiswa: ";
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            getline(cin, newDataPTI->alamatMahasiswaPTI);
-
-            cout << "Masukkan IP Mahasiswa: ";
-            cin >> newDataPTI->ipMahasiswaPTI;
-            
-            newDataPTI->next = nullptr;
-
-            if (!headPTI) {
-                headPTI = newDataPTI;
-            } else {
-                treeMahasiswaPTI* temp = headPTI;
-                while (temp->next != nullptr) {
-                    temp = temp->next;
-                }
-                temp->next = newDataPTI;
-            }
-
-            totaldataPTI++;
-            cout << "Data mahasiswa berhasil ditambahkan.\n";
-        }
-
-        void tambahData() {
-            while (true) {
-                int prodiPath;
-                int tambahLagi;
-
-                cout << "\nPilih prodi mahasiswa\n";
-                cout << "1) Teknik Informatika\n";
-                cout << "2) Sistem Informasi\n";
-                cout << "3) Pendidikan Teknologi Informasi\n";
-                cout << "0) Kembali ke menu utama\n";
-                cout << "> ";
-
-                cin >> prodiPath;
-                errorInput(prodiPath); // Handling error input
-
-                if (prodiPath == 1) {
-                    tambahDataTI();
-                } else if (prodiPath == 2) {
-                    tambahDataSI();
-                } else if (prodiPath == 3) {
-                    tambahDataPTI();
-                } else if (prodiPath == 0) {
-                    cout << "\n>> Kembali ke menu utama\n";
-                    break; // Exit loop
-                } else {
-                    cout << "\n>> Input tidak valid\n";
-                    continue; // Invalid input, ask again
-                }
-
-                cout << "\nApakah Anda ingin menambah data mahasiswa lain? (1: Ya, 0: Tidak)\n> ";
-
-                cin >> tambahLagi;
-                errorInput(tambahLagi);
-
-                if (tambahLagi == 0) {
-                    break;
-                }
-            }
-        }
-
-        // ----------------------------------------------------- Fungsi menampilkan data -----------------------------------------------------
-
-        void tampilDataTI() {
-            if (!headTI) {
-            cout << "\nTidak ada data yang tersedia.\n";
+        if (!headTI) {
+            cout << "\nTidak ada data mahasiswa TI.\n";
             return;
-            }
-
-            bool exitRequested = false;
-
-            while (!exitRequested) {
-                treeMahasiswaTI* currTI = mahasiswaTIByIndex(currentIndexTI); // Mengambil data supir pada indeks currentIndexTI
-
-                if (currTI) {                                                                                                                                                                                              
-                    cout << "\nNama Mahasiswa: " << currTI->namaMahasiswaTI << endl;
-                    cout << "Usia Mahasiswa: " << currTI->umurMahasiswaTI << endl;
-                    cout << "Alamat Mahasiswa: " << currTI->alamatMahasiswaTI << endl;
-                    cout << "NIM Mahasiswa: " << currTI->nimMahasiswaTI <<endl;
-                    cout << "IP Mahasiswa: " << currTI->ipMahasiswaTI << endl;
-                    cout << endl;
-
-                    string choice;
-                    cout << "1. berikutnya\n"; 
-                    cout << "2. sebelumnya\n";
-                    cout << "0. kembali ke menu sebelumnya\n";
-                    cout << "Masukkan pilihan (0-2): ";
-                    cin >> choice;
-
-                    if (choice == "1") {
-                        currentIndexTI = (currentIndexTI + 1) % totaldataTI; // Pindah ke data berikutnya
-                    } else if (choice == "2") {
-                        currentIndexTI = (currentIndexTI == 0) ? totaldataTI - 1 : currentIndexTI - 1; // Pindah ke data sebelumnya
-                    } else if (choice == "0") {
-                        exitRequested = true; // Keluar dari iterasi
-                    } else {
-                        cout << "Pilihan tidak valid. Silakan coba lagi.\n";
-                    }
-                }
-            }
         }
 
-        void tampilDataSI() {
-            if (!headSI) {
-            cout << "\nTidak ada data yang tersedia.\n";
+        if (headTI->nimMahasiswaTI == nim) {
+            treeMahasiswaTI* temp = headTI;
+            headTI = headTI->next;
+            hashTableTI.erase(temp->nimMahasiswaTI);
+            delete temp;
+            cout << "\nData mahasiswa TI berhasil dihapus.\n";
+            totaldataTI--;
             return;
-            }
-        
-
-            bool exitRequested = false;
-
-            while (!exitRequested) {
-                treeMahasiswaSI* currSI = mahasiswaSIByIndex(currentIndexSI); // Mengambil data supir pada indeks currentIndexSI
-                if (currSI) {                                                                                                                                                                                              
-                    cout << "\nNama Mahasiswa: " << currSI->namaMahasiswaSI << endl;
-                    cout << "Usia Mahasiswa: " << currSI->umurMahasiswaSI << endl;
-                    cout << "Alamat Mahasiswa: " << currSI->alamatMahasiswaSI << endl;
-                    cout << "NIM Mahasiswa: " << currSI->nimMahasiswaSI << endl;
-                    cout << "IP Mahasiswa: " << currSI->ipMahasiswaSI << endl;
-                    cout << endl;
-
-                    string choice;
-                    cout << "1. berikutnya\n"; 
-                    cout << "2. sebelumnya\n";
-                    cout << "0. kembali ke menu sebelumnya\n";
-                    cout << "Masukkan pilihan (0-2): ";
-                    cin >> choice;
-
-                    if (choice == "1") {
-                        currentIndexSI = (currentIndexSI + 1) % totaldataSI; // Pindah ke data supir berikutnya
-                    } else if (choice == "2") {
-                        currentIndexSI = (currentIndexSI == 0) ? totaldataSI - 1 : currentIndexSI - 1; // Pindah ke data supir sebelumnya
-                    } else if (choice == "0") {
-                        exitRequested = true; // Keluar dari iterasi
-                    } else {
-                        cout << "Pilihan tidak valid. Silakan coba lagi.\n";
-                    }
-                }
-            }
         }
-    
 
-        void tampilDataPTI() {
-            if (!headPTI) {
-                cout << "\nTidak ada data yang tersedia.\n";
+        treeMahasiswaTI* prev = headTI;
+        treeMahasiswaTI* curr = headTI->next;
+        while (curr) {
+            if (curr->nimMahasiswaTI == nim) {
+                prev->next = curr->next;
+                hashTableTI.erase(curr->nimMahasiswaTI);
+                delete curr;
+                cout << "\nData mahasiswa TI berhasil dihapus.\n";
+                totaldataTI--;
                 return;
             }
-
-            bool exitRequested = false;
-
-            while (!exitRequested) {
-                treeMahasiswaPTI* currPTI = mahasiswaPTIByIndex(currentIndexPTI); // Mengambil data pada indeks currentIndexPTI
-
-                if (currPTI) {                                                                                                                                                                                              
-                    cout << "\nNama Mahasiswa: " << currPTI->namaMahasiswaPTI << endl;
-                    cout << "Usia Mahasiswa: " << currPTI->umurMahasiswaPTI << endl;
-                    cout << "Alamat Mahasiswa: " << currPTI->alamatMahasiswaPTI << endl;
-                    cout << "NIM Mahasiswa: " << currPTI->nimMahasiswaPTI << endl;
-                    cout << "IP Mahasiswa: " << currPTI->ipMahasiswaPTI << endl;
-                    cout << endl;
-
-                    string choice;
-                    cout << "1. berikutnya\n"; 
-                    cout << "2. sebelumnya\n";
-                    cout << "0. kembali ke menu sebelumnya\n";
-                    cout << "Masukkan pilihan (0-2): ";
-                    cin >> choice;
-
-                    if (choice == "1") {
-                        currentIndexPTI = (currentIndexPTI + 1) % totaldataPTI; // Pindah ke data berikutnya
-                    } else if (choice == "2") {
-                        currentIndexPTI = (currentIndexPTI == 0) ? totaldataPTI - 1 : currentIndexPTI - 1; // Pindah ke data sebelumnya
-                    } else if (choice == "0") {
-                        exitRequested = true; // Keluar dari iterasi
-                    } else {
-                        cout << "Pilihan tidak valid. Silakan coba lagi.\n";
-                    }
-                }
-            }
+            prev = curr;
+            curr = curr->next;
         }
-    
 
-        void tampilData() {
-            while (true) {
-                int prodi;
-            
-                cout << "\nPilih prodi mahasiswa\n";
-                cout << "1) Teknik Informatika\n";
-                cout << "2) Sistem Informasi\n";
-                cout << "3) Pendidikan Teknologi Informasi\n";
-                cout << "0) Kembali ke menu utama\n";
-                cout << "> ";
+        cout << "\nData mahasiswa TI tidak ditemukan.\n";
+    }
 
-                cin >> prodi;
-                errorInput(prodi); // Handling error input
+    void hapusDataSI() {
+        int64_t nim;
+        cout << "\nMasukkan NIM mahasiswa yang ingin dihapus: ";
+        cin >> nim;
 
-                if (prodi == 1) {
-                    tampilDataTI();
-                } else if (prodi == 2) {
-                    tampilDataSI();
-                } else if (prodi == 3) {
-                    tampilDataPTI();
-                } else if (prodi == 0) {
-                    cout << "\n>> Kembali ke menu utama\n";
-                    break; // Exit loop
-                } else {
-                    cout << "\n>> Input tidak valid\n";
-                    continue; // Invalid input, ask again
-                }
-            }
+        if (!headSI) {
+            cout << "\nTidak ada data mahasiswa SI.\n";
+            return;
         }
+
+        if (headSI->nimMahasiswaSI == nim) {
+            treeMahasiswaSI* temp = headSI;
+            headSI = headSI->next;
+            hashTableSI.erase(temp->nimMahasiswaSI);
+            delete temp;
+            cout << "\nData mahasiswa SI berhasil dihapus.\n";
+            totaldataSI--;
+            return;
+        }
+
+        treeMahasiswaSI* prev = headSI;
+        treeMahasiswaSI* curr = headSI->next;
+        while (curr) {
+            if (curr->nimMahasiswaSI == nim) {
+                prev->next = curr->next;
+                hashTableSI.erase(curr->nimMahasiswaSI);
+                delete curr;
+                cout << "\nData mahasiswa SI berhasil dihapus.\n";
+                totaldataSI--;
+                return;
+            }
+            prev = curr;
+            curr = curr->next;
+        }
+
+        cout << "\nData mahasiswa SI tidak ditemukan.\n";
+    }
+
+    void hapusDataPTI() {
+        int64_t nim;
+        cout << "\nMasukkan NIM mahasiswa yang ingin dihapus: ";
+        cin >> nim;
+
+        if (!headPTI) {
+            cout << "\nTidak ada data mahasiswa PTI.\n";
+            return;
+        }
+
+        if (headPTI->nimMahasiswaPTI == nim) {
+            treeMahasiswaPTI* temp = headPTI;
+            headPTI = headPTI->next;
+            hashTablePTI.erase(temp->nimMahasiswaPTI);
+            delete temp;
+            cout << "\nData mahasiswa PTI berhasil dihapus.\n";
+            totaldataPTI--;
+            return;
+        }
+
+        treeMahasiswaPTI* prev = headPTI;
+        treeMahasiswaPTI* curr = headPTI->next;
+        while (curr) {
+            if (curr->nimMahasiswaPTI == nim) {
+                prev->next = curr->next;
+                hashTablePTI.erase(curr->nimMahasiswaPTI);
+                delete curr;
+                cout << "\nData mahasiswa PTI berhasil dihapus.\n";
+                totaldataPTI--;
+                return;
+            }
+            prev = curr;
+            curr = curr->next;
+        }
+
+        cout << "\nData mahasiswa PTI tidak ditemukan.\n";
+    }
+
+    void tampilDataEligibleQueue() {
+        cout << "\nMasukkan pilihan 1 untuk mahasiswa TI\n";
+        cout << "Masukkan pilihan 2 untuk mahasiswa SI\n";
+        cout << "Masukkan pilihan 3 untuk mahasiswa PTI\n";
+        int pilihan;
+        cin >> pilihan;
+
+        switch (pilihan) {
+            case 1:
+                while (!queueTI.empty()) {
+                    treeMahasiswaTI* mahasiswa = queueTI.front();
+                    cout << "\nNIM: " << mahasiswa->nimMahasiswaTI << "\n";
+                    cout << "Nama: " << mahasiswa->namaMahasiswaTI << "\n";
+                    cout << "Umur: " << mahasiswa->umurMahasiswaTI << "\n";
+                    cout << "Alamat: " << mahasiswa->alamatMahasiswaTI << "\n";
+                    cout << "IP: " << mahasiswa->ipMahasiswaTI << "\n";
+                    queueTI.pop();
+                }
+                break;
+            case 2:
+                while (!queueSI.empty()) {
+                    treeMahasiswaSI* mahasiswa = queueSI.front();
+                    cout << "\nNIM: " << mahasiswa->nimMahasiswaSI << "\n";
+                    cout << "Nama: " << mahasiswa->namaMahasiswaSI << "\n";
+                    cout << "Umur: " << mahasiswa->umurMahasiswaSI << "\n";
+                    cout << "Alamat: " << mahasiswa->alamatMahasiswaSI << "\n";
+                    cout << "IP: " << mahasiswa->ipMahasiswaSI << "\n";
+                    queueSI.pop();
+                }
+                break;
+            case 3:
+                while (!queuePTI.empty()) {
+                    treeMahasiswaPTI* mahasiswa = queuePTI.front();
+                    cout << "\nNIM: " << mahasiswa->nimMahasiswaPTI << "\n";
+                    cout << "Nama: " << mahasiswa->namaMahasiswaPTI << "\n";
+                    cout << "Umur: " << mahasiswa->umurMahasiswaPTI << "\n";
+                    cout << "Alamat: " << mahasiswa->alamatMahasiswaPTI << "\n";
+                    cout << "IP: " << mahasiswa->ipMahasiswaPTI << "\n";
+                    queuePTI.pop();
+                }
+                break;
+            default:
+                cout << "\nPilihan tidak valid.\n";
+        }
+    }
+
+    void tampilDataEligibleStack() {
+        cout << "\nMasukkan pilihan 1 untuk mahasiswa TI\n";
+        cout << "Masukkan pilihan 2 untuk mahasiswa SI\n";
+        cout << "Masukkan pilihan 3 untuk mahasiswa PTI\n";
+        int pilihan;
+        cin >> pilihan;
+
+        switch (pilihan) {
+            case 1:
+                while (!stackTI.empty()) {
+                    treeMahasiswaTI* mahasiswa = stackTI.top();
+                    cout << "\nNIM: " << mahasiswa->nimMahasiswaTI << "\n";
+                    cout << "Nama: " << mahasiswa->namaMahasiswaTI << "\n";
+                    cout << "Umur: " << mahasiswa->umurMahasiswaTI << "\n";
+                    cout << "Alamat: " << mahasiswa->alamatMahasiswaTI << "\n";
+                    cout << "IP: " << mahasiswa->ipMahasiswaTI << "\n";
+                    stackTI.pop();
+                }
+                break;
+            case 2:
+                while (!stackSI.empty()) {
+                    treeMahasiswaSI* mahasiswa = stackSI.top();
+                    cout << "\nNIM: " << mahasiswa->nimMahasiswaSI << "\n";
+                    cout << "Nama: " << mahasiswa->namaMahasiswaSI << "\n";
+                    cout << "Umur: " << mahasiswa->umurMahasiswaSI << "\n";
+                    cout << "Alamat: " << mahasiswa->alamatMahasiswaSI << "\n";
+                    cout << "IP: " << mahasiswa->ipMahasiswaSI << "\n";
+                    stackSI.pop();
+                }
+                break;
+            case 3:
+                while (!stackPTI.empty()) {
+                    treeMahasiswaPTI* mahasiswa = stackPTI.top();
+                    cout << "\nNIM: " << mahasiswa->nimMahasiswaPTI << "\n";
+                    cout << "Nama: " << mahasiswa->namaMahasiswaPTI << "\n";
+                    cout << "Umur: " << mahasiswa->umurMahasiswaPTI << "\n";
+                    cout << "Alamat: " << mahasiswa->alamatMahasiswaPTI << "\n";
+                    cout << "IP: " << mahasiswa->ipMahasiswaPTI << "\n";
+                    stackPTI.pop();
+                }
+                break;
+            default:
+                cout << "\nPilihan tidak valid.\n";
+        }
+    }
+
+    void cariData() {
+        cout << "\nMasukkan pilihan 1 untuk mencari mahasiswa TI\n";
+        cout << "Masukkan pilihan 2 untuk mencari mahasiswa SI\n";
+        cout << "Masukkan pilihan 3 untuk mencari mahasiswa PTI\n";
+        int pilihan;
+        int64_t nim;
+        cin >> pilihan;
+
+        cout << "\nMasukkan NIM mahasiswa: ";
+        cin >> nim;
+
+        switch (pilihan) {
+            case 1:
+                cariDataTI(nim);
+                break;
+            case 2:
+                cariDataSI(nim);
+                break;
+            case 3:
+                cariDataPTI(nim);
+                break;
+            default:
+                cout << "\nPilihan tidak valid.\n";
+        }
+    }
+
+    void cariDataTI(int64_t nim) {
+        if (hashTableTI.find(nim) != hashTableTI.end()) {
+            treeMahasiswaTI* mahasiswa = hashTableTI[nim];
+            cout << "\nNIM: " << mahasiswa->nimMahasiswaTI << "\n";
+            cout << "Nama: " << mahasiswa->namaMahasiswaTI << "\n";
+            cout << "Umur: " << mahasiswa->umurMahasiswaTI << "\n";
+            cout << "Alamat: " << mahasiswa->alamatMahasiswaTI << "\n";
+            cout << "IP: " << mahasiswa->ipMahasiswaTI << "\n";
+        } else {
+            cout << "\nMahasiswa TI dengan NIM " << nim << " tidak ditemukan.\n";
+        }
+    }
+
+    void cariDataSI(int64_t nim) {
+        if (hashTableSI.find(nim) != hashTableSI.end()) {
+            treeMahasiswaSI* mahasiswa = hashTableSI[nim];
+            cout << "\nNIM: " << mahasiswa->nimMahasiswaSI << "\n";
+            cout << "Nama: " << mahasiswa->namaMahasiswaSI << "\n";
+            cout << "Umur: " << mahasiswa->umurMahasiswaSI << "\n";
+            cout << "Alamat: " << mahasiswa->alamatMahasiswaSI << "\n";
+            cout << "IP: " << mahasiswa->ipMahasiswaSI << "\n";
+        } else {
+            cout << "\nMahasiswa SI dengan NIM " << nim << " tidak ditemukan.\n";
+        }
+    }
+
+    void cariDataPTI(int64_t nim) {
+        if (hashTablePTI.find(nim) != hashTablePTI.end()) {
+            treeMahasiswaPTI* mahasiswa = hashTablePTI[nim];
+            cout << "\nNIM: " << mahasiswa->nimMahasiswaPTI << "\n";
+            cout << "Nama: " << mahasiswa->namaMahasiswaPTI << "\n";
+            cout << "Umur: " << mahasiswa->umurMahasiswaPTI << "\n";
+            cout << "Alamat: " << mahasiswa->alamatMahasiswaPTI << "\n";
+            cout << "IP: " << mahasiswa->ipMahasiswaPTI << "\n";
+        } else {
+            cout << "\nMahasiswa PTI dengan NIM " << nim << " tidak ditemukan.\n";
+        }
+    }
 };
 
 int main() {
-    dataMahasiswa dm;
-
-    cout << "\n----------Program manajemen data mahasiswa TI----------\n";
+    DataMahasiswa dataMahasiswa;
+    int pilihan;
 
     do {
-        int homePath;
+        cout << "\nMenu:\n";
+        cout << "1. Tambah Data Mahasiswa\n";
+        cout << "2. Tampil Data Mahasiswa\n";
+        cout << "3. Hapus Data Mahasiswa\n";
+        cout << "4. Tampil Data Eligible (Queue)\n";
+        cout << "5. Tampil Data Eligible (Stack)\n";
+        cout << "6. Cari Data Mahasiswa\n";
+        cout << "7. Keluar\n";
+        cout << "Masukkan pilihan: ";
+        cin >> pilihan;
 
-        cout << "\n1. Tambahkan data mahasiswa\n";
-        cout << "2. Hapus data mahasiswa\n";
-        cout << "3. Tampilkan data seluruh mahasiswa\n";
-        cout << "4. Tampilkan data mahasiswa eligible\n";
-        cout << "5. Cari data mahasiswa berdasarkan NIM\n";
-        cout << "0. Keluar dari program\n";
-        cout << "\n";
-        cout << "> ";
-
-        cin >> homePath;
-        errorInput(homePath); // Handling error input
-
-        if (homePath == 1) {
-            dm.tambahData();
-        } else if (homePath == 2) {
-            // Implementasi hapus data mahasiswa
-        } else if (homePath == 3) {
-            dm.tampilData();
-        } else if (homePath == 4) {
-            // Implementasi tampilkan data mahasiswa eligible
-        } else if (homePath == 5) {
-            // Implementasi cari data mahasiswa berdasarkan NIM
-        } else if (homePath == 0) {
-            cout << "\n>> Keluar dari program\n";
-            break; // Exit loop
-        } else {
-            cout << "\n>> Input tidak valid\n";
+        switch (pilihan) {
+            case 1:
+                dataMahasiswa.tambahDataEligible();
+                break;
+            case 2:
+                dataMahasiswa.tampilData();
+                break;
+            case 3:
+                dataMahasiswa.hapusData();
+                break;
+            case 4:
+                dataMahasiswa.tampilDataEligibleQueue();
+                break;
+            case 5:
+                dataMahasiswa.tampilDataEligibleStack();
+                break;
+            case 6:
+                dataMahasiswa.cariData();
+                break;
+            case 7:
+                cout << "\nKeluar program.\n";
+                break;
+            default:
+                cout << "\nPilihan tidak valid.\n";
         }
-    } while (true);
+    } while (pilihan != 7);
 
     return 0;
 }
